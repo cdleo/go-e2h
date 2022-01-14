@@ -9,5 +9,5 @@ GO Enhanced Error Handling is a lightweight Golang package to add a better stack
 
 ## Sample
 
-You can find a sample of the use of go-e2h project [HERE](https://github.com/cdleo/go-e2h/e2h_example_test.go)
+You can find a sample of the use of go-e2h project [HERE](https://github.com/cdleo/go-e2h/blob/master/e2h_example_test.go)
 
