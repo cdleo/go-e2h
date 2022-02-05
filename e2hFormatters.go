@@ -1,3 +1,6 @@
+/*
+Package e2h its the package of the Enhanced Error Handling module
+*/
 package e2h
 
 import (
@@ -12,10 +15,10 @@ type jsonStack struct {
 	Context  string `json:"context,omitempty"`
 }
 
-func newJSONStack(item *details, prefixToRemove string) jsonStack {
+func newJSONStack(item *details, rootFolder2Show string) jsonStack {
 	return jsonStack{
 		FuncName: item.funcName,
-		Caller:   fmt.Sprintf("%s:%d", removeUnTilPrefix(item.file, prefixToRemove), item.line),
+		Caller:   fmt.Sprintf("%s:%d", removePathBeforeFolder(item.file, rootFolder2Show), item.line),
 		Context:  item.message,
 	}
 }
@@ -25,7 +28,8 @@ type jsonDetails struct {
 	Stack []jsonStack `json:"stack_trace"`
 }
 
-func Cause(err error) string {
+// This function returns an string containing the description of the very first error in the stack
+func Source(err error) string {
 	switch err.(type) {
 	case EnhancedError:
 		return err.(*enhancedError).Cause().Error()
@@ -34,7 +38,8 @@ func Cause(err error) string {
 	}
 }
 
-func FormatJSON(err error, fromFolderPath string) []byte {
+// This function returns the error stack information in a JSON format
+func FormatJSON(err error, fromFolderPath string, indented bool) []byte {
 
 	details := jsonDetails{
 		Err:   err.Error(),
@@ -51,14 +56,21 @@ func FormatJSON(err error, fromFolderPath string) []byte {
 		//Do Nothing
 	}
 
-	result, marshalError := json.Marshal(details)
+	var result []byte
+	var marshalError error
+	if indented {
+		result, marshalError = json.MarshalIndent(details, "", "\t")
+	} else {
+		result, marshalError = json.Marshal(details)
+	}
 	if marshalError != nil {
 		return []byte{0}
 	}
 	return result
 }
 
-func FormatPretty(err error, fromFolderPath string) string {
+// This function returns the error stack information in a pretty format
+func FormatPretty(err error, rootFolder2Show string) string {
 
 	var result string
 	switch err.(type) {
@@ -70,7 +82,7 @@ func FormatPretty(err error, fromFolderPath string) string {
 				result += fmt.Sprintf("- %s:\n", stackItem.message)
 			}
 			result += fmt.Sprintf("  %s\n", stackItem.funcName)
-			result += fmt.Sprintf("  \t%s:%d\n", removeUnTilPrefix(stackItem.file, fromFolderPath), stackItem.line)
+			result += fmt.Sprintf("  \t%s:%d\n", removePathBeforeFolder(stackItem.file, rootFolder2Show), stackItem.line)
 		}
 		result += fmt.Sprintf("- %s\n", stkError.Cause())
 	default:
@@ -79,15 +91,16 @@ func FormatPretty(err error, fromFolderPath string) string {
 	return result
 }
 
-func removeUnTilPrefix(file string, fromFolderPath string) string {
+// Utility funtion that removes the first part of the `file` path til the folder indicated in `fromFolder` argument
+func removePathBeforeFolder(file string, fromFolder string) string {
 
-	if len(fromFolderPath) <= 0 {
+	if len(fromFolder) <= 0 {
 		return file
 	}
 
-	fileParts := strings.Split(file, fromFolderPath)
+	fileParts := strings.Split(file, fromFolder)
 	if len(fileParts) < 2 {
 		return file
 	}
-	return fromFolderPath + fileParts[1]
+	return fromFolder + fileParts[1]
 }
