@@ -39,7 +39,7 @@ func Source(err error) string {
 }
 
 // This function returns the error stack information in a JSON format
-func FormatJSON(err error, fromFolderPath string, indented bool) []byte {
+func FormatJSON(err error, rootFolder2Show string, indented bool) []byte {
 
 	details := jsonDetails{
 		Err:   err.Error(),
@@ -50,7 +50,7 @@ func FormatJSON(err error, fromFolderPath string, indented bool) []byte {
 	case EnhancedError:
 		stkError := err.(*enhancedError)
 		for i := len(stkError.stack) - 1; i >= 0; i-- {
-			details.Stack = append(details.Stack, newJSONStack(&stkError.stack[i], fromFolderPath))
+			details.Stack = append(details.Stack, newJSONStack(&stkError.stack[i], rootFolder2Show))
 		}
 	default:
 		//Do Nothing
@@ -91,16 +91,16 @@ func FormatPretty(err error, rootFolder2Show string) string {
 	return result
 }
 
-// Utility funtion that removes the first part of the `file` path til the folder indicated in `fromFolder` argument
-func removePathBeforeFolder(file string, fromFolder string) string {
+// Utility funtion that removes the first part of the file path til the folder indicated in `newRootFolder` argument
+func removePathBeforeFolder(file string, newRootFolder string) string {
 
-	if len(fromFolder) <= 0 {
+	if len(newRootFolder) <= 0 {
 		return file
 	}
 
-	fileParts := strings.Split(file, fromFolder)
+	fileParts := strings.Split(file, newRootFolder)
 	if len(fileParts) < 2 {
 		return file
 	}
-	return fromFolder + fileParts[1]
+	return newRootFolder + fileParts[1]
 }
