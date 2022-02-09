@@ -1,3 +1,6 @@
+/*
+Package e2h its the package of the Enhanced Error Handling module
+*/
 package e2h
 
 import (
@@ -5,16 +8,23 @@ import (
 	"runtime"
 )
 
-func TraceA(e error) error {
+// This function calls the addTrace in order to create or add stack info
+func Trace(e error) error {
 	return addTrace(e, "")
 }
-func Trace(e error, message string) error {
+
+// Same as Trace, but adding a descriptive message
+func Tracem(e error, message string) error {
 	return addTrace(e, message)
 }
+
+// Same as Tracem, but the descriptive message can have formatted values
 func Tracef(e error, format string, args ...interface{}) error {
 	return addTrace(e, format, args...)
 }
 
+// This is the private function that creates the first EnhancedError
+// with info or add the new info to the existing one
 func addTrace(err error, format string, args ...interface{}) error {
 
 	if err == nil {
