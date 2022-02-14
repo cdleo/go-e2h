@@ -36,11 +36,11 @@ func addTrace(err error, format string, args ...interface{}) error {
 		message = fmt.Sprintf(format, args...)
 	}
 	pc, file, line, _ := runtime.Caller(2)
-	info := details{
-		file:     file,
-		line:     line,
-		funcName: runtime.FuncForPC(pc).Name(),
-		message:  message,
+	info := StackDetails{
+		File:     file,
+		Line:     line,
+		FuncName: runtime.FuncForPC(pc).Name(),
+		Message:  message,
 	}
 
 	switch err.(type) {
@@ -51,7 +51,7 @@ func addTrace(err error, format string, args ...interface{}) error {
 	default:
 		return &enhancedError{
 			err:   err,
-			stack: append(make([]details, 0), info),
+			stack: append(make([]StackDetails, 0), info),
 		}
 	}
 }
