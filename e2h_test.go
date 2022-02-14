@@ -269,8 +269,11 @@ func TestEnhancedError_EnhErr_RawFormatter_Format_PartialPathHidden(t *testing.T
 	// Execute
 	output := rawFormatter.Format(enhancedErr, params)
 
+	want := strings.ReplaceAll("This is a standard error; github.com/cdleo/go-e2h_test.TestEnhancedError_EnhErr_RawFormatter_Format_PartialPathHidden (go-e2h/e2h_test.go:260) [Error wrapped with additional info];",
+		"go-e2h", params.PathHidingValue)
+
 	// Check
-	require.Equal(t, output, "This is a standard error; github.com/cdleo/go-e2h_test.TestEnhancedError_EnhErr_RawFormatter_Format_PartialPathHidden (go-e2h/e2h_test.go:260) [Error wrapped with additional info];")
+	require.Equal(t, want, output)
 }
 
 func TestEnhancedError_EnhErr_JSONFormatter_Format_PartialPathHidden(t *testing.T) {
@@ -288,8 +291,11 @@ func TestEnhancedError_EnhErr_JSONFormatter_Format_PartialPathHidden(t *testing.
 	// Execute
 	output := jsonFormatter.Format(enhancedErr, params)
 
+	want := strings.ReplaceAll("{\"error\":\"This is a standard error\",\"stack_trace\":[{\"func\":\"github.com/cdleo/go-e2h_test.TestEnhancedError_EnhErr_JSONFormatter_Format_PartialPathHidden\",\"caller\":\"go-e2h/e2h_test.go:282\",\"context\":\"Error wrapped with additional info\"}]}",
+		"go-e2h", params.PathHidingValue)
+
 	// Check
-	require.Equal(t, output, "{\"error\":\"This is a standard error\",\"stack_trace\":[{\"func\":\"github.com/cdleo/go-e2h_test.TestEnhancedError_EnhErr_JSONFormatter_Format_PartialPathHidden\",\"caller\":\"go-e2h/e2h_test.go:279\",\"context\":\"Error wrapped with additional info\"}]}")
+	require.Equal(t, want, output)
 }
 
 func TestEnhancedError_EnhError_JSONFormatter_Format_MultipleTraces(t *testing.T) {
@@ -311,5 +317,5 @@ func TestEnhancedError_EnhError_JSONFormatter_Format_MultipleTraces(t *testing.T
 	output := jsonFormatter.Format(enhancedErr, params)
 
 	// Check
-	require.Equal(t, output, "{\n\t\"error\": \"This is a standard error\",\n\t\"stack_trace\": [\n\t\t{\n\t\t\t\"func\": \"github.com/cdleo/go-e2h_test.TestEnhancedError_EnhError_JSONFormatter_Format_MultipleTraces\",\n\t\t\t\"caller\": \"e2h_test.go:298\",\n\t\t\t\"context\": \"Error wrapped with additional info\"\n\t\t},\n\t\t{\n\t\t\t\"func\": \"github.com/cdleo/go-e2h_test.TestEnhancedError_EnhError_JSONFormatter_Format_MultipleTraces\",\n\t\t\t\"caller\": \"e2h_test.go:299\",\n\t\t\t\"context\": \"This is the 2nd. stack level\"\n\t\t},\n\t\t{\n\t\t\t\"func\": \"github.com/cdleo/go-e2h_test.TestEnhancedError_EnhError_JSONFormatter_Format_MultipleTraces\",\n\t\t\t\"caller\": \"e2h_test.go:300\"\n\t\t}\n\t]\n}")
+	require.Equal(t, output, "{\n\t\"error\": \"This is a standard error\",\n\t\"stack_trace\": [\n\t\t{\n\t\t\t\"func\": \"github.com/cdleo/go-e2h_test.TestEnhancedError_EnhError_JSONFormatter_Format_MultipleTraces\",\n\t\t\t\"caller\": \"e2h_test.go:304\",\n\t\t\t\"context\": \"Error wrapped with additional info\"\n\t\t},\n\t\t{\n\t\t\t\"func\": \"github.com/cdleo/go-e2h_test.TestEnhancedError_EnhError_JSONFormatter_Format_MultipleTraces\",\n\t\t\t\"caller\": \"e2h_test.go:305\",\n\t\t\t\"context\": \"This is the 2nd. stack level\"\n\t\t},\n\t\t{\n\t\t\t\"func\": \"github.com/cdleo/go-e2h_test.TestEnhancedError_EnhError_JSONFormatter_Format_MultipleTraces\",\n\t\t\t\"caller\": \"e2h_test.go:306\"\n\t\t}\n\t]\n}")
 }
