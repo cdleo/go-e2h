@@ -269,8 +269,8 @@ func TestEnhancedError_EnhErr_RawFormatter_Format_PartialPathHidden(t *testing.T
 	// Execute
 	output := rawFormatter.Format(enhancedErr, params)
 
-	want := strings.ReplaceAll("This is a standard error; github.com/cdleo/go-e2h_test.TestEnhancedError_EnhErr_RawFormatter_Format_PartialPathHidden (go-e2h/e2h_test.go:260) [Error wrapped with additional info];",
-		"go-e2h", params.PathHidingValue)
+	want := strings.ReplaceAll("This is a standard error; github.com/cdleo/go-e2h_test.TestEnhancedError_EnhErr_RawFormatter_Format_PartialPathHidden (<LAST_DIR>/e2h_test.go:260) [Error wrapped with additional info];",
+		"<LAST_DIR>", params.PathHidingValue)
 
 	// Check
 	require.Equal(t, want, output)
@@ -291,8 +291,8 @@ func TestEnhancedError_EnhErr_JSONFormatter_Format_PartialPathHidden(t *testing.
 	// Execute
 	output := jsonFormatter.Format(enhancedErr, params)
 
-	want := strings.ReplaceAll("{\"error\":\"This is a standard error\",\"stack_trace\":[{\"func\":\"github.com/cdleo/go-e2h_test.TestEnhancedError_EnhErr_JSONFormatter_Format_PartialPathHidden\",\"caller\":\"go-e2h/e2h_test.go:282\",\"context\":\"Error wrapped with additional info\"}]}",
-		"go-e2h", params.PathHidingValue)
+	want := strings.ReplaceAll("{\"error\":\"This is a standard error\",\"stack_trace\":[{\"func\":\"github.com/cdleo/go-e2h_test.TestEnhancedError_EnhErr_JSONFormatter_Format_PartialPathHidden\",\"caller\":\"<LAST_DIR>/e2h_test.go:282\",\"context\":\"Error wrapped with additional info\"}]}",
+		"<LAST_DIR>", params.PathHidingValue)
 
 	// Check
 	require.Equal(t, want, output)
