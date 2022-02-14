@@ -36,12 +36,19 @@ func Tracem(e error, message string) error
 func Tracef(e error, format string, args ...interface{}) error
 ```
 
-Additionally, this module provide functions to pretty print the error information, over different outputs:
+Additionally, we provide a package called e2hformat in order to get the error information, over different formats:
 
 ```go
 type Formatter interface {
 	Source(err error) string
 	Format(err error, params Params) string
+}
+
+type Params struct {
+	Beautify         bool
+	InvertCallstack  bool
+	PathHidingMethod HidingMethod
+	PathHidingValue  string
 }
 
 
