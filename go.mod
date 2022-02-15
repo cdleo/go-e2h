@@ -1,6 +1,6 @@
 module github.com/cdleo/go-e2h
 
-go 1.11
+go 1.14
 
 require github.com/stretchr/testify v1.7.0
 
