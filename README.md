@@ -1,8 +1,6 @@
 # GO-E2H
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/cdleo/go-e2h/README.md.svg)](https://pkg.go.dev/github.com/cdleo/go-e2h/README.md)
-
-[![Go Reference](http://img.shields.io/badge/godoc-reference-blue.svg?style=flat)](https://pkg.go.dev/github.com/cdleo/go-e2h) [![license](http://img.shields.io/badge/license-MIT-red.svg?style=flat)](https://raw.githubusercontent.com/cdleo/go-e2h/master/LICENSE) [![Build Status](https://travis-ci.org/rs/zerolog.svg?branch=master)](https://travis-ci.org/rs/zerolog) [![Coverage](http://gocover.io/_badge/github.com/rs/zerolog)](http://gocover.io/github.com/rs/zerolog)
+[![Go Reference](http://img.shields.io/badge/godoc-reference-blue.svg?style=flat)](https://pkg.go.dev/github.com/cdleo/go-e2h) [![license](http://img.shields.io/badge/license-MIT-red.svg?style=flat)](https://raw.githubusercontent.com/cdleo/go-e2h/master/LICENSE) [![Build Status](https://travis-ci.org/rs/zerolog.svg?branch=master)](https://travis-ci.org/rs/zerolog) [![Code Coverage](https://scrutinizer-ci.com/g/cdleo/go-e2h/badges/coverage.png?b=feature/addingReferences)](https://scrutinizer-ci.com/g/cdleo/go-e2h/?branch=feature/addingReferences) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/cdleo/go-e2h/badges/quality-score.png?b=feature/addingReferences)](https://scrutinizer-ci.com/g/cdleo/go-e2h/?branch=feature/addingReferences)
 
 GO Enhanced Error Handling (a.k.a. go-e2h) is a lightweight Golang module to add a better stack trace and context information on error events.
 
@@ -36,8 +34,8 @@ func Tracem(e error, message string) error
 func Tracef(e error, format string, args ...interface{}) error
 ```
 
-Additionally, we provide a package called e2hformat in order to get the error information, over different formats:
-
+Additionally, we provide a package called e2hformat in order to get the error information, over different formats
+Currently, 
 ```go
 type Formatter interface {
 	Source(err error) string
