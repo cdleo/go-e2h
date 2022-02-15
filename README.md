@@ -1,17 +1,21 @@
 # GO-E2H
 
+[![Go Reference](http://img.shields.io/badge/godoc-reference-blue.svg?style=flat)](https://pkg.go.dev/github.com/cdleo/go-e2h) [![license](http://img.shields.io/badge/license-MIT-red.svg?style=flat)](https://raw.githubusercontent.com/cdleo/go-e2h/master/LICENSE) [![Build Status](https://scrutinizer-ci.com/g/cdleo/go-e2h/badges/build.png?b=master)](https://scrutinizer-ci.com/g/cdleo/go-e2h/build-status/master) [![Code Coverage](https://scrutinizer-ci.com/g/cdleo/go-e2h/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/cdleo/go-e2h/?branch=master) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/cdleo/go-e2h/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/cdleo/go-e2h/?branch=master)
+
 GO Enhanced Error Handling (a.k.a. go-e2h) is a lightweight Golang module to add a better stack trace and context information on error events.
 
-## Usage
+## General
 
 We use an object of the provided interface EnhancedError to store the context and stack information:
 
 ```go
 type EnhancedError interface {
-    // This function returns the Error string plus the origin custom message (if exists)
+    // This function returns the Error string plus the first context message (if exists)
 	Error() string
     // This function returns the source error
 	Cause() error
+	// This function returns an array with the callstack details
+	Stack() []StackDetails
 }
 ```
 
@@ -30,9 +34,22 @@ func Tracem(e error, message string) error
 func Tracef(e error, format string, args ...interface{}) error
 ```
 
-Additionally, this module provide functions to pretty print the error information, over different outputs:
-
+Additionally, we provide a package called e2hformat in order to get the error information, over different formats
+Currently, 
 ```go
+type Formatter interface {
+	Source(err error) string
+	Format(err error, params Params) string
+}
+
+type Params struct {
+	Beautify         bool
+	InvertCallstack  bool
+	PathHidingMethod HidingMethod
+	PathHidingValue  string
+}
+
+
 // This function returns an string containing the description of the very first error in the stack
 func Source(err error) string 
 
@@ -58,61 +75,117 @@ package e2h_test
 
 import (
 	"fmt"
+	"os"
+	"path/filepath"
+	"runtime"
 
 	"github.com/cdleo/go-e2h"
+	e2hformat "github.com/cdleo/go-e2h/formatter"
 )
 
 func foo() error {
-	return fmt.Errorf("foo")
+
+	//Doing something, an error it's returned
+	err := fmt.Errorf("TheError")
+	if err != nil {
+		//It's not mandatory, but recommended to call TraceX() from deepest possible in the stack
+		//to get the most additional data
+		return e2h.Trace(err)
+	}
+
+	//Do stuff
+
+	return nil
 }
 
 func bar() error {
-	return e2h.Tracem(foo(), "This call wraps the GO standard error and adds this message and other helpful information")
+	return e2h.Tracem(foo(), "Error executing foo()")
 }
 
 func ExampleEnhancedError() {
+	_, b, _, _ := runtime.Caller(0)
+	hideThisPath := filepath.Dir(b) + string(os.PathSeparator)
 
-	err := e2h.Tracef(bar(), "This call adds this %s message and stack information", "formatted")
+	params := e2hformat.Params{
+		Beautify:         false,
+		InvertCallstack:  true,
+		PathHidingMethod: e2hformat.HidingMethod_FullBaseline,
+		PathHidingValue:  hideThisPath,
+	}
 
-	fmt.Printf("Just cause => %s\n", e2h.Source(err))
+	err := e2h.Tracef(bar(), "Error executing [%s] function", "bar()")
 
-	fmt.Printf("Just as Error => %v\n", err)
+	fmt.Printf("As Error => %v\n\n", err)
 
-	fmt.Printf("Full info (pretty) =>\n%s", e2h.FormatPretty(err, "github.com"))
+	fmt.Printf("**** Raw Formatter ****\n\n")
 
-	fmt.Printf("Full info JSON (indented) =>\n\t%s\n", e2h.FormatJSON(err, "github.com", true))
+	rawFormatter, _ := e2hformat.NewFormatter(e2hformat.Format_Raw)
 
-	fmt.Printf("Full info JSON (std) =>\n\t%s\n", e2h.FormatJSON(err, "github.com", false))
+	fmt.Printf("Just cause => %s\n\n", rawFormatter.Source(err))
+
+	fmt.Printf("Full info (inverted stack) =>\n%s\n\n", rawFormatter.Format(err, params))
+
+	params.Beautify = true
+	fmt.Printf("Full info (beautified / inverted stack) =>\n%s\n\n", rawFormatter.Format(err, params))
+
+	fmt.Printf("**** JSON Formatter ****\n\n")
+
+	jsonFormatter, _ := e2hformat.NewFormatter(e2hformat.Format_JSON)
+
+	fmt.Printf("Just cause => %s\n\n", jsonFormatter.Source(err))
+
+	params.InvertCallstack = false
+	params.Beautify = false
+	fmt.Printf("Full info =>\n%s\n\n", jsonFormatter.Format(err, params))
+
+	params.Beautify = true
+	fmt.Printf("Full info (beautified) =>\n%s\n", jsonFormatter.Format(err, params))
 
 	// Output:
-	// Just cause => foo
-	// Just as Error => foo: This call wraps the GO standard error and adds this message and other helpful information
-	// Full info (pretty) =>
-	// - This call adds this formatted message and stack information:
-	//   github.com/cdleo/go-e2h_test.ExampleEnhancedError
-	//   	github.com/cdleo/go-e2h/e2h_example_test.go:22
-	// - This call wraps the GO standard error and adds this message and other helpful information:
-	//   github.com/cdleo/go-e2h_test.bar
-	//   	github.com/cdleo/go-e2h/e2h_example_test.go:17
-	// - foo
-	// Full info JSON (indented) =>
-	// 	{
-	// 	"error": "foo: This call wraps the GO standard error and adds this message and other helpful information",
+	// As Error => TheError
+	//
+	// **** Raw Formatter ****
+	//
+	// Just cause => TheError
+	//
+	// Full info (inverted stack) =>
+	// github.com/cdleo/go-e2h_test.ExampleEnhancedError (e2h_example_test.go:46) [Error executing [bar()] function]; github.com/cdleo/go-e2h_test.bar (e2h_example_test.go:32) [Error executing foo()]; github.com/cdleo/go-e2h_test.foo (e2h_example_test.go:23); TheError;
+	//
+	// Full info (beautified / inverted stack) =>
+	// github.com/cdleo/go-e2h_test.ExampleEnhancedError (e2h_example_test.go:46)
+	// 	Error executing [bar()] function
+	// github.com/cdleo/go-e2h_test.bar (e2h_example_test.go:32)
+	// 	Error executing foo()
+	// github.com/cdleo/go-e2h_test.foo (e2h_example_test.go:23)
+	// TheError
+	//
+	// **** JSON Formatter ****
+	//
+	// Just cause => {"error":"TheError"}
+	//
+	// Full info =>
+	// {"error":"TheError","stack_trace":[{"func":"github.com/cdleo/go-e2h_test.foo","caller":"e2h_example_test.go:23"},{"func":"github.com/cdleo/go-e2h_test.bar","caller":"e2h_example_test.go:32","context":"Error executing foo()"},{"func":"github.com/cdleo/go-e2h_test.ExampleEnhancedError","caller":"e2h_example_test.go:46","context":"Error executing [bar()] function"}]}
+	//
+	// Full info (beautified) =>
+	// {
+	// 	"error": "TheError",
 	// 	"stack_trace": [
 	// 		{
-	// 			"func": "github.com/cdleo/go-e2h_test.ExampleEnhancedError",
-	// 			"caller": "github.com/cdleo/go-e2h/e2h_example_test.go:22",
-	// 			"context": "This call adds this formatted message and stack information"
+	// 			"func": "github.com/cdleo/go-e2h_test.foo",
+	// 			"caller": "e2h_example_test.go:23"
 	// 		},
 	// 		{
 	// 			"func": "github.com/cdleo/go-e2h_test.bar",
-	// 			"caller": "github.com/cdleo/go-e2h/e2h_example_test.go:17",
-	// 			"context": "This call wraps the GO standard error and adds this message and other helpful information"
+	// 			"caller": "e2h_example_test.go:32",
+	// 			"context": "Error executing foo()"
+	// 		},
+	// 		{
+	// 			"func": "github.com/cdleo/go-e2h_test.ExampleEnhancedError",
+	// 			"caller": "e2h_example_test.go:46",
+	// 			"context": "Error executing [bar()] function"
 	// 		}
 	// 	]
 	// }
-	// Full info JSON (std) =>
-	// 	{"error":"foo: This call wraps the GO standard error and adds this message and other helpful information","stack_trace":[{"func":"github.com/cdleo/go-e2h_test.ExampleEnhancedError","caller":"github.com/cdleo/go-e2h/e2h_example_test.go:22","context":"This call adds this formatted message and stack information"},{"func":"github.com/cdleo/go-e2h_test.bar","caller":"github.com/cdleo/go-e2h/e2h_example_test.go:17","context":"This call wraps the GO standard error and adds this message and other helpful information"}]}
 
 }
 ```
