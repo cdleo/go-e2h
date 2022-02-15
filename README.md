@@ -56,10 +56,10 @@ Once you have the formatter, you could change some details of output style modif
 according to the following table:
 | Param | Definition | Allowed values  | Default value  |
 |---|---|---|---|
-| Beautify | Sets if the output will be beautified | true / false  | false |
-| InvertCallstack | Sets if shows the last call or the origin error first | true (last call first) / false (origin error first) | false |
+| Beautify | Sets if the output will be beautified | True / False  | False |
+| InvertCallstack | Sets if shows the last call or the origin error first | True (last call first) / False (origin error first) | False |
 | PathHidingMethod | Sets the way in with the filepaths are managed  | HidingMethod_None / HidingMethod_FullBaseline /  HidingMethod_ToFolder | HidingMethod_None |
-| PathHidingValue | Value to use, according to the selected 'PathHidingMethod' | A dirpath string | "" |
+| PathHidingValue | Value to use, according to the selected 'PathHidingMethod' | A DirPath string | "" |
 
 ## Usage
 
