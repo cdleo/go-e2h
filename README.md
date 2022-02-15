@@ -34,31 +34,32 @@ func Tracem(e error, message string) error
 func Tracef(e error, format string, args ...interface{}) error
 ```
 
-Additionally, we provide a package called e2hformat in order to get the error information, over different formats
-Currently, 
+Additionally, we provide a package called **e2hformat** in order to retrieve the error information, over different formats.
+
+To starters, you must call the `NewFormatter(format Format) (Formatter, error)` function, indicating the desired format, to get the instance of this type.
+
 ```go
 type Formatter interface {
+	// This function returns an string containing the description of the very first error in the stack
 	Source(err error) string
+
+	// This function returns the error stack information 
 	Format(err error, params Params) string
 }
-
-type Params struct {
-	Beautify         bool
-	InvertCallstack  bool
-	PathHidingMethod HidingMethod
-	PathHidingValue  string
-}
-
-
-// This function returns an string containing the description of the very first error in the stack
-func Source(err error) string 
-
-// This function returns the error stack information in a JSON format
-func FormatJSON(err error, rootFolder2Show string, indented bool) []byte
-
-// This function returns the error stack information in a pretty format
-func FormatPretty(err error, rootFolder2Show string) string 
 ```
+
+Currently allowed formats:
+- **Format_Raw**: Non-hierarchical text format, with some decorators to get it human readable
+- **Format_JSON**: JSON standard format
+
+Once you have the formatter, you could change some details of output style modifying the values of the Params struct, 
+according to the following table:
+| Param | Definition | Allowed values  | Default value  |
+|---|---|---|---|
+| Beautify | Sets if the output will be beautified | true / false  | false |
+| InvertCallstack | Sets if shows the last call or the origin error first | true (last call first) / false (origin error first) | false |
+| PathHidingMethod | Sets the way in with the filepaths are managed  | HidingMethod_None / HidingMethod_FullBaseline /  HidingMethod_ToFolder | HidingMethod_None |
+| PathHidingValue | Value to use, according to the selected 'PathHidingMethod' | A dirpath string | "" |
 
 ## Usage
 
