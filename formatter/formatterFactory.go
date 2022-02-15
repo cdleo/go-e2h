@@ -8,18 +8,17 @@ import (
 	"strings"
 )
 
-// Level defines log levels.
 type Format int8
-type HidingMethod int8
 
+// Allowed output formats.
 const (
-	// Disabled disables the logger.
 	Format_Raw Format = iota
-
-	// Mensajes de muy baja frecuencia que se deben mostrar siempre (como el copyright)
 	Format_JSON
 )
 
+type HidingMethod int8
+
+//Allowed path treatments
 const (
 	HidingMethod_None HidingMethod = iota
 
@@ -29,10 +28,14 @@ const (
 )
 
 type Params struct {
-	Beautify         bool
-	InvertCallstack  bool
+	//Sets if the output will be beautified
+	Beautify bool
+	//Sets if at top of the stack shows the last trace (invert = true) or the origin error (invert = false)
+	InvertCallstack bool
+	//Sets the way in with the filepaths are managed.
 	PathHidingMethod HidingMethod
-	PathHidingValue  string
+	//Value to use, according to the selected 'PathHidingMethod'
+	PathHidingValue string
 }
 
 type Formatter interface {
