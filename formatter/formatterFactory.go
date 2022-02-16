@@ -5,6 +5,7 @@ package e2hformat
 
 import (
 	"fmt"
+	"path/filepath"
 	"strings"
 )
 
@@ -71,6 +72,7 @@ func formatSourceFile(file string, hidingMethod HidingMethod, hidingValue string
 // Utility funtion that removes the first part of the filepath til the end of `baseline` path argument
 func removePathSegment(file string, baseline string) string {
 
+	file = filepath.Clean(file)
 	prettyCaller := strings.ReplaceAll(file, baseline, "")
 	if len(prettyCaller) > 0 {
 		return prettyCaller
