@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/cdleo/go-commons/formatter"
 	"github.com/cdleo/go-e2h"
 )
 
@@ -73,7 +74,7 @@ func (s *rawFormatter) Format(err error, params Params) string {
 
 func (s *rawFormatter) formatItem(withInfoTrace string, withoutInfoTrace string, params Params, item e2h.StackDetails) string {
 
-	filePath := formatSourceFile(item.File, params.PathHidingMethod, params.PathHidingValue)
+	filePath := formatter.FormatSourceFile(item.File, params.PathHidingMethod, params.PathHidingValue)
 
 	if len(item.Message) > 0 {
 		return fmt.Sprintf(withInfoTrace, item.FuncName, filePath, item.Line, item.Message)
