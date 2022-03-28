@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 	"runtime"
 
+	"github.com/cdleo/go-commons/formatter"
 	"github.com/cdleo/go-e2h"
 	e2hformat "github.com/cdleo/go-e2h/formatter"
 )
@@ -39,7 +40,7 @@ func ExampleEnhancedError() {
 	params := e2hformat.Params{
 		Beautify:         false,
 		InvertCallstack:  true,
-		PathHidingMethod: e2hformat.HidingMethod_FullBaseline,
+		PathHidingMethod: formatter.HidingMethod_FullBaseline,
 		PathHidingValue:  hideThisPath,
 	}
 
@@ -79,14 +80,14 @@ func ExampleEnhancedError() {
 	// Just cause => TheError
 	//
 	// Full info (inverted stack) =>
-	// github.com/cdleo/go-e2h_test.ExampleEnhancedError (e2h_example_test.go:46) [Error executing [bar()] function]; github.com/cdleo/go-e2h_test.bar (e2h_example_test.go:32) [Error executing foo()]; github.com/cdleo/go-e2h_test.foo (e2h_example_test.go:23); TheError;
+	// github.com/cdleo/go-e2h_test.ExampleEnhancedError (e2h_example_test.go:47) [Error executing [bar()] function]; github.com/cdleo/go-e2h_test.bar (e2h_example_test.go:33) [Error executing foo()]; github.com/cdleo/go-e2h_test.foo (e2h_example_test.go:24); TheError;
 	//
 	// Full info (beautified / inverted stack) =>
-	// github.com/cdleo/go-e2h_test.ExampleEnhancedError (e2h_example_test.go:46)
+	// github.com/cdleo/go-e2h_test.ExampleEnhancedError (e2h_example_test.go:47)
 	// 	Error executing [bar()] function
-	// github.com/cdleo/go-e2h_test.bar (e2h_example_test.go:32)
+	// github.com/cdleo/go-e2h_test.bar (e2h_example_test.go:33)
 	// 	Error executing foo()
-	// github.com/cdleo/go-e2h_test.foo (e2h_example_test.go:23)
+	// github.com/cdleo/go-e2h_test.foo (e2h_example_test.go:24)
 	// TheError
 	//
 	// **** JSON Formatter ****
@@ -94,7 +95,7 @@ func ExampleEnhancedError() {
 	// Just cause => {"error":"TheError"}
 	//
 	// Full info =>
-	// {"error":"TheError","stack_trace":[{"func":"github.com/cdleo/go-e2h_test.foo","caller":"e2h_example_test.go:23"},{"func":"github.com/cdleo/go-e2h_test.bar","caller":"e2h_example_test.go:32","context":"Error executing foo()"},{"func":"github.com/cdleo/go-e2h_test.ExampleEnhancedError","caller":"e2h_example_test.go:46","context":"Error executing [bar()] function"}]}
+	// {"error":"TheError","stack_trace":[{"func":"github.com/cdleo/go-e2h_test.foo","caller":"e2h_example_test.go:24"},{"func":"github.com/cdleo/go-e2h_test.bar","caller":"e2h_example_test.go:33","context":"Error executing foo()"},{"func":"github.com/cdleo/go-e2h_test.ExampleEnhancedError","caller":"e2h_example_test.go:47","context":"Error executing [bar()] function"}]}
 	//
 	// Full info (beautified) =>
 	// {
@@ -102,16 +103,16 @@ func ExampleEnhancedError() {
 	// 	"stack_trace": [
 	// 		{
 	// 			"func": "github.com/cdleo/go-e2h_test.foo",
-	// 			"caller": "e2h_example_test.go:23"
+	// 			"caller": "e2h_example_test.go:24"
 	// 		},
 	// 		{
 	// 			"func": "github.com/cdleo/go-e2h_test.bar",
-	// 			"caller": "e2h_example_test.go:32",
+	// 			"caller": "e2h_example_test.go:33",
 	// 			"context": "Error executing foo()"
 	// 		},
 	// 		{
 	// 			"func": "github.com/cdleo/go-e2h_test.ExampleEnhancedError",
-	// 			"caller": "e2h_example_test.go:46",
+	// 			"caller": "e2h_example_test.go:47",
 	// 			"context": "Error executing [bar()] function"
 	// 		}
 	// 	]

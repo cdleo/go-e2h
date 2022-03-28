@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/cdleo/go-commons/formatter"
 	"github.com/cdleo/go-e2h"
 )
 
@@ -26,9 +27,9 @@ type jsonSource struct {
 	Context string `json:"context,omitempty"`
 }
 
-func newJSONStack(item *e2h.StackDetails, hidingMethod HidingMethod, pathOrFolder string) jsonStack {
+func newJSONStack(item *e2h.StackDetails, hidingMethod formatter.HidingMethod, pathOrFolder string) jsonStack {
 
-	filePath := formatSourceFile(item.File, hidingMethod, pathOrFolder)
+	filePath := formatter.FormatSourceFile(item.File, hidingMethod, pathOrFolder)
 
 	return jsonStack{
 		FuncName: item.FuncName,
